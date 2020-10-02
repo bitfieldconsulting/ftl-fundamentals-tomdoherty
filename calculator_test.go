@@ -15,15 +15,7 @@ type testCase struct {
 	errExpected bool
 }
 
-type testCaseVariadic struct {
-	a           []float64
-	want        float64
-	comment     string
-	err         error
-	errExpected bool
-}
-
-var testCasesAdd = []testCaseVariadic{
+var testCasesAdd = []testCase {
 	{a: 1, b: 2, want: 3, comment: "one add two"},
 	{a: 2, b: 5, want: 7, comment: "two add five"},
 }
