@@ -35,7 +35,7 @@ func Divide(a, b float64) (float64, error) {
 // Sqrt takes one numbers and returns the square root
 func Sqrt(a float64) (float64, error) {
 	if a < 0 {
-		return 0, fmt.Errorf("invalid input(%f): division by zero error", a)
+		return 0, fmt.Errorf("invalid input(%f): input must be greater than zero", a)
 	}
 	return math.Sqrt(a), nil
 }

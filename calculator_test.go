@@ -11,16 +11,22 @@ func TestAdd(t *testing.T) {
 	testCases := []struct {
 		a, b    float64
 		want    float64
-		comment string
+		test string
 	}{
-		{a: 1, b: 2, want: 3, comment: "one add two"},
-		{a: 2, b: 5, want: 7, comment: "two add five"},
+		{a: 1, b: 2, want: 3, test: "one add two"},
+		{a: 2, b: 5, want: 7, test: "two add five"},
+		{a: -2, b: 2, want: 0, test: "minus two add two"},
+		{a: -2, b: -2, want: -4, test: "minus two add minus two"},
+		{a: -0, b: -2, want: -2, test: "zero add minus two"},
+		{a: -2.6, b: 0.4, want: -2.2, test: "minus two point six add zero point four"},
+		{a: math.Inf(1), b: -1, want: math.Inf(1), test: "+Inf add minus one"},
+		{a: math.Inf(-1), b: -1, want: math.Inf(-1), test: "-Inf add minus one"},
 	}
 	t.Parallel()
 	for _, tc := range testCases {
 		got := calculator.Add(tc.a, tc.b)
 		if tc.want != got {
-			t.Errorf("test %s: want %f, got %f", tc.comment, tc.want, got)
+			t.Errorf("test %s: want %f, got %f", tc.test, tc.want, got)
 		}
 	}
 }
@@ -42,16 +48,22 @@ func TestSubtract(t *testing.T) {
 	testCases := []struct {
 		a, b    float64
 		want    float64
-		comment string
+		test string
 	}{
-		{a: 1, b: 2, want: -1, comment: "one minus two"},
-		{a: 2, b: 5, want: -3, comment: "two minus five"},
+		{a: 1, b: 2, want: -1, test: "one minus two"},
+		{a: 2, b: 5, want: -3, test: "two minus five"},
+		{a: -2, b: 2, want: -4, test: "minus two minus two"},
+		{a: -2, b: -2, want: 0, test: "minus two minus minus two"},
+		{a: 0, b: -2, want: 2, test: "zero minus minus two"},
+		{a: -2.6, b: 0.4, want: -3, test: "minus two point six minus zero point four"},
+		{a: math.Inf(1), b: -1, want: math.Inf(1), test: "+Inf minus minus one"},
+		{a: math.Inf(-1), b: -1, want: math.Inf(-1), test: "-Inf minus minus one"},
 	}
 	t.Parallel()
 	for _, tc := range testCases {
 		got := calculator.Subtract(tc.a, tc.b)
 		if tc.want != got {
-			t.Errorf("test %s: want %f, got %f", tc.comment, tc.want, got)
+			t.Errorf("test %s: want %f, got %f", tc.test, tc.want, got)
 		}
 	}
 }
@@ -73,16 +85,21 @@ func TestMultiply(t *testing.T) {
 	testCases := []struct {
 		a, b    float64
 		want    float64
-		comment string
+		test string
 	}{
-		{a: 1, b: 2, want: 2, comment: "one times two"},
-		{a: 2, b: 5, want: 10, comment: "two times five"},
+		{a: 1, b: 2, want: 2, test: "one times two"},
+		{a: 2, b: 5, want: 10, test: "two times five"},
+		{a: -2, b: -2, want: 4, test: "minus two times minus two"},
+		{a: 0, b: -2, want: 0, test: "zero times minus two"},
+		{a: -2.6, b: 0.4, want: -1.04, test: "minus two point six minus zero point four"},
+		{a: math.Inf(1), b: -1, want: math.Inf(-1), test: "+Inf times minus one"},
+		{a: math.Inf(-1), b: -1, want: math.Inf(1), test: "-Inf times minus one"},
 	}
 	t.Parallel()
 	for _, tc := range testCases {
 		got := calculator.Multiply(tc.a, tc.b)
 		if tc.want != got {
-			t.Errorf("test %s: want %f, got %f", tc.comment, tc.want, got)
+			t.Errorf("test %s: want %f, got %f", tc.test, tc.want, got)
 		}
 	}
 }
@@ -104,23 +121,25 @@ func TestDivide(t *testing.T) {
 	testCases := []struct {
 		a, b        float64
 		want        float64
-		comment     string
+		test     string
 		errExpected bool
 	}{
-		{a: 2, b: 1, want: 2, errExpected: false, comment: "two divided by 1"},
-		{a: 10, b: 5, want: 2, errExpected: false, comment: "ten divided by 5"},
-		{a: 10, b: 0, want: 0, errExpected: true, comment: "error out on divide by zero"},
-		{a: 10, b: 0, want: 1, errExpected: true, comment: "test error case by failing want vs get"},
+		{a: 2, b: 1, want: 2, errExpected: false, test: "two divided by 1"},
+		{a: 10, b: 5, want: 2, errExpected: false, test: "ten divided by 5"},
+		{a: 10, b: 0, want: 0, errExpected: true, test: "error out on divide by zero"},
+		{a: 10, b: 0, want: 1, errExpected: true, test: "test error case by failing want vs get"},
+		{a: 10, b: 0, want: 1_000_000, errExpected: true, test: "dodgy want to test err"},
+		{a: 10, b: 0, want: 999, errExpected: true, test: "dodgy want to test err"},
 	}
 	t.Parallel()
 	for _, tc := range testCases {
 		got, err := calculator.Divide(tc.a, tc.b)
 		errorReceived := err != nil
 		if errorReceived != tc.errExpected {
-			t.Fatalf("test %s: expected err %t, got %t", tc.comment, tc.errExpected, errorReceived)
+			t.Fatalf("test %s: expected err %t, got %t", tc.test, tc.errExpected, errorReceived)
 		}
 		if !errorReceived && tc.want != got {
-			t.Errorf("test %s: want %f, got %f", tc.comment, tc.want, got)
+			t.Errorf("test %s: want %f, got %f", tc.test, tc.want, got)
 		}
 	}
 }
@@ -145,23 +164,24 @@ func TestSqrt(t *testing.T) {
 	testCases := []struct {
 		a, b        float64
 		want        float64
-		comment     string
+		test     string
 		errExpected bool
 	}{
-		{a: 16, want: 4, errExpected: false, comment: "square root of 16"},
-		{a: -1, want: 0, errExpected: true, comment: "error"},
-		{a: -1, want: 0, errExpected: true, comment: "error out on negative input"},
-		{a: -1, want: 1, errExpected: true, comment: "test error case by failing want vs get"},
+		{a: 16, want: 4, errExpected: false, test: "square root of 16"},
+		{a: -1, want: 0, errExpected: true, test: "error"},
+		{a: -1, want: 0, errExpected: true, test: "error out on negative input"},
+		{a: -1, want: 1, errExpected: true, test: "test error case by failing want vs get"},
+		{a: math.Inf(0), want: math.Inf(0), errExpected: false, test: "test +Inf"},
 	}
 	t.Parallel()
 	for _, tc := range testCases {
 		got, err := calculator.Sqrt(tc.a)
 		errorReceived := err != nil
 		if errorReceived != tc.errExpected {
-			t.Fatalf("test %s: expected err %t, got %t", tc.comment, tc.errExpected, errorReceived)
+			t.Fatalf("test %s: expected err %t, got %t", tc.test, tc.errExpected, errorReceived)
 		}
 		if !errorReceived && tc.want != got {
-			t.Errorf("test %s: want %f, got %f", tc.comment, tc.want, got)
+			t.Errorf("test %s: want %f, got %f", tc.test, tc.want, got)
 		}
 	}
 }
